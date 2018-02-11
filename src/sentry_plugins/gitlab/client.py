@@ -40,14 +40,11 @@ class GitLabClient(object):
         try:
             return self.request(
                 'GET',
-                '/projects/{}/issues'.format(
+                '/projects/{}/issues/{}'.format(
                     quote(repo, safe=''),
-                ),
-                params={
-                    # XXX(dcramer): this is an undocumented API
-                    'iid': issue_id,
-                }
-            )[0]
+                    issue_id
+                )
+            )
         except IndexError:
             raise ApiError('Issue not found with ID', 404)
 
@@ -73,3 +70,22 @@ class GitLabClient(object):
             'GET',
             '/projects/{}/members'.format(quote(repo, safe='')),
         )
+
+    def get_commits(self, repo):
+        return self.request(
+            'GET',
+            '/projects/{}/repository/commits'.format(quote(repo, safe=''))
+        )
+
+    def get_commit(self, repo, commit_sha):
+        return self.request(
+            'GET',
+            '/projects/{}/repository/commits/{}'.format(quote(repo, safe=''), commit_sha)
+        )
+
+    def get_merge_request_commits(self, repo, merge_request_iid):
+        return self.request(
+            'GET',
+            '/projects/{}/merge_requests/{}/commits'.format(quote(repo, safe=''), merge_request_iid)
+        )
+
